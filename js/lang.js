@@ -136,7 +136,7 @@ const translations = {
     }
 };
 
-// Language name mapping for html lang attribute
+
 const langCodes = {
     ge: 'ka',
     en: 'en',
@@ -144,16 +144,15 @@ const langCodes = {
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Collect ALL language switcher links (desktop + mobile)
+
     const allLangLinks = document.querySelectorAll(".lang-switcher a, .mobile-lang-switcher a");
     
     function applyLanguage(lang) {
         if (!translations[lang]) return;
 
-        // Update html lang attribute
+
         document.documentElement.setAttribute('lang', langCodes[lang] || lang);
 
-        // Update all active states across both switchers
         allLangLinks.forEach(l => {
             if (l.getAttribute('data-lang') === lang) {
                 l.classList.add('active');
@@ -162,7 +161,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Apply translations
         document.querySelectorAll("[data-i18n]").forEach(el => {
             const key = el.getAttribute("data-i18n");
             if (translations[lang][key] !== undefined) {
@@ -171,11 +169,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Bind click handlers to all language links
     allLangLinks.forEach(link => {
         link.addEventListener("click", (e) => {
             e.preventDefault();
-            e.stopPropagation(); // Prevent smooth scroll handler
+            e.stopPropagation(); 
             const lang = link.getAttribute("data-lang");
             applyLanguage(lang);
         });

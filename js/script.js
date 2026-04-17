@@ -1,4 +1,4 @@
-// script.js — Fixmob.ge Premium Interactions
+
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 loadingScreen.classList.add('hidden');
             }, 600);
         });
-        // Fallback: dismiss after 3s max
+        
         setTimeout(() => {
             loadingScreen.classList.add('hidden');
         }, 3000);
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ================================
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
-            // Skip language switcher links
+            
             if (this.hasAttribute('data-lang')) return;
 
             const targetId = this.getAttribute('href');
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                // Close mobile nav if open
+                
                 closeMobileNav();
 
                 const headerHeight = document.querySelector('.header')?.offsetHeight || 70;
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
             document.body.style.overflow = isOpen ? 'hidden' : '';
         });
 
-        // Close mobile nav when a link is clicked
+        
         mobileNav.querySelectorAll('.mobile-nav-link, .mobile-nav-cta').forEach(link => {
             link.addEventListener('click', () => {
                 closeMobileNav();
@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
             animObserver.observe(el);
         });
     } else {
-        // If reduced motion, make everything visible immediately
+        
         document.querySelectorAll('.animate-on-scroll, .animate-scale').forEach(el => {
             el.classList.add('animate-visible');
         });
@@ -218,7 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Trigger initial checks
+    
     handleHeaderScroll();
     updateProgress();
     handleBackToTop();
