@@ -5,7 +5,7 @@ const translations = {
         "nav-why": "უპირატესობები",
         "nav-contact": "დაგვიკავშირდით",
         "a-title": "ჩვენს შესახებ",
-        "a-p1": "Fixmob.ge წარმოადგენს პრემიუმ კლასის სერვის ცენტრს თბილისში. ჩვენ 2009 წლიდან ვაკეთებთ მობილურებს და ვზრუნავთ ტექნოლოგიების ხანგრძლივ სიცოცხლეზე. ჩვენი გუნდი აერთიანებს მაღალკვალიფიციურ ინჟინრებს 17 წელზე მეტი გამოცდილებით.",
+        "a-p1": "Fixmob.ge წარმოადგენს პრემიუმ კლასის სერვის ცენტრს ბათუმში, რომელიც 2009 წლიდან ზრუნავს ტექნოლოგიების ხანგრძლივ სიცოცხლეზე. ჩვენი გუნდი აერთიანებს მაღალკვალიფიციურ ინჟინრებს 17 წელზე მეტი გამოცდილებით.",
         "a-p2": "ჩვენი მიზანია შევქმნათ ისეთი მომსახურება, სადაც ტექნიკური სირთულეები მარტივად და გამჭვირვალედ იჭრება. ჩვენ ვზრუნავთ თითოეულ დეტალზე და ვიყენებთ მხოლოდ საუკეთესო სერტიფიცირებულ ტექნოლოგიურ აღჭურვილობას.",
         "a-s1": "17+",
         "a-s1t": "წელი ბაზარზე",
@@ -148,38 +148,7 @@ const langCodes = {
     ru: "ru",
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-    const allLangLinks = document.querySelectorAll(
-        ".lang-switcher a, .mobile-lang-switcher a",
-    );
-
-    function applyLanguage(lang) {
-        if (!translations[lang]) return;
-
-        document.documentElement.setAttribute("lang", langCodes[lang] || lang);
-
-        allLangLinks.forEach((l) => {
-            if (l.getAttribute("data-lang") === lang) {
-                l.classList.add("active");
-            } else {
-                l.classList.remove("active");
-            }
-        });
-
-        document.querySelectorAll("[data-i18n]").forEach((el) => {
-            const key = el.getAttribute("data-i18n");
-            if (translations[lang][key] !== undefined) {
-                el.innerHTML = translations[lang][key];
-            }
-        });
-    }
-
-    allLangLinks.forEach((link) => {
-        link.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const lang = link.getAttribute("data-lang");
-            applyLanguage(lang);
-        });
-    });
-});
+// Each language has a pre-rendered URL (/, /en/, /ru/). The lang switcher
+// uses plain <a href> navigation, so client-side swapping is intentionally
+// removed — swapping content without changing the URL would desync the
+// canonical/hreflang tags from what's displayed.

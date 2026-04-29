@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /.git/
+Disallow: /.DS_Store
+
+Sitemap: https://fixmob.ge/sitemap.xml
