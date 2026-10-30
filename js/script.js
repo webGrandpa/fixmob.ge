@@ -26,21 +26,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ================================
-    // 2. Preloader — waits for page load and the 3D phone (with a hard cap)
+    // 2. Preloader — the phone "charges" while the 3D scene and fonts load,
+    //    then the camera dives into its screen. Never waits on images/iframes.
     // ================================
+    const preloader = document.getElementById('preloader');
     const countEl = document.getElementById('preloader-count');
-    const barEl = document.getElementById('preloader-bar');
-    const wantsPhone = root.classList.contains('webgl');
-    let pageLoaded = document.readyState === 'complete';
-    let phoneReady = !wantsPhone;
+    let fontsReady = !document.fonts;
     let finished = false;
     let shown = 0;
     const startedAt = performance.now();
+    const MIN_MS = 1100; // lets the outline finish drawing
+    const MAX_MS = 3000;
 
-    window.addEventListener('load', () => { pageLoaded = true; });
-    // Web fonts change heading heights — re-measure scroll scenes once they land.
-    document.fonts?.ready.then(() => hasGsap && ScrollTrigger.refresh());
-    window.addEventListener('phone:ready', () => { phoneReady = true; });
+    document.fonts?.ready.then(() => {
+        fontsReady = true;
+        // Web fonts change heading heights — re-measure scroll scenes once they land.
+        if (hasGsap) ScrollTrigger.refresh();
+    });
+
+    // phone3d.js (a module) can finish before this handler runs, so read its
+    // state from the root classes instead of relying on catching the event.
+    const phoneSettled = () => !root.classList.contains('webgl') || root.classList.contains('webgl-ready');
 
     function finishLoading() {
         if (finished) return;
@@ -57,19 +63,25 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function leavePreloader() {
+        if (!preloader) return finishLoading();
+        preloader.classList.add('is-full');
+        setTimeout(() => {
+            preloader.classList.add('is-leaving');
+            setTimeout(finishLoading, 380);
+            setTimeout(() => { preloader.style.display = 'none'; }, 1400);
+        }, 450);
+    }
+
     (function tickLoader() {
         const elapsed = performance.now() - startedAt;
-        const ready = pageLoaded && phoneReady && elapsed > 900;
-        const timedOut = elapsed > 4500;
-        const target = ready || timedOut ? 100 : Math.min(92, (elapsed / 2200) * 92);
-        shown += (target - shown) * (ready || timedOut ? 0.22 : 0.08);
+        const ready = (phoneSettled() && fontsReady && elapsed > MIN_MS) || elapsed > MAX_MS;
+        const target = ready ? 100 : Math.min(88, (elapsed / MIN_MS) * 88);
+        shown += (target - shown) * (ready ? 0.2 : 0.12);
+        if (shown > 99.5) shown = 100;
+        preloader?.style.setProperty('--p', shown.toFixed(1));
         if (countEl) countEl.textContent = Math.round(shown);
-        if (barEl) barEl.style.transform = `scaleX(${shown / 100})`;
-        if (shown > 99.5 && (ready || timedOut)) {
-            if (countEl) countEl.textContent = '100';
-            setTimeout(finishLoading, 180);
-            return;
-        }
+        if (shown === 100) return leavePreloader();
         requestAnimationFrame(tickLoader);
     })();
 
