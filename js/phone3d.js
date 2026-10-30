@@ -621,6 +621,9 @@ function init() {
     const progressEls = [...document.querySelectorAll('.anatomy__tick')];
     const doneEl = document.querySelector('.anatomy__done');
     const hintEl = document.querySelector('.anatomy__hint');
+    const stageSticky = document.querySelector('.stage__sticky');
+    const headerEl = document.getElementById('header');
+    const eyebrowEl = hero?.querySelector('.hero__eyebrow');
 
     // ---------- State ----------
     const target = { heroP: 0, anatomyP: 0, mx: 0, my: 0 };
@@ -629,6 +632,7 @@ function init() {
         explode: 0, mx: 0, my: 0, fixed: 0, labels: 0,
     };
     let activeStep = -1;
+    let wasGlued = false;
     let screenFixed = false;
     let first = true;
 
@@ -718,10 +722,26 @@ function init() {
         const explode = smooth(ap, 0.03, 0.2) * (1 - smooth(ap, 0.8, 0.93));
         const done = smooth(ap, 0.8, 0.95);
 
+        // Portrait: the hero phone is glued to its slot between the header and
+        // the eyebrow, so it scrolls with the copy instead of sitting under it.
+        // It then fades back in for the anatomy.
+        const glued = portrait && ap <= 0;
+        if (portrait && eyebrowEl) {
+            const ch = canvas.clientHeight;
+            const unitsPerPx = (2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))) / ch;
+            const top = (headerEl ? headerEl.offsetHeight + 16 : 80) - window.scrollY;
+            const bottom = eyebrowEl.getBoundingClientRect().top - 14;
+            P.hero.y = (ch / 2 - (top + bottom) / 2) * unitsPerPx;
+            P.hero.s = Math.min(0.8, Math.max(0.3, ((bottom - top) * unitsPerPx * 0.9) / H));
+            if (stageSticky) stageSticky.style.opacity = ap > 0 ? smooth(ap, 0, 0.05).toFixed(3) : '1';
+        } else if (stageSticky && stageSticky.style.opacity) {
+            stageSticky.style.opacity = '';
+        }
+
         // Pose blend: hero → (mid) → anatomy → done
-        const mid = {
+        const mid = portrait ? { ...(glued ? P.hero : P.anat) } : {
             x: lerp(P.hero.x, P.anat.x, hp),
-            y: lerp(P.hero.y, portrait ? P.anat.y : 0, hp),
+            y: lerp(P.hero.y, 0, hp),
             s: lerp(P.hero.s, P.anat.s * 1.05, hp),
             rx: lerp(P.hero.rx, 0.15, hp),
             ry: lerp(P.hero.ry, -0.75, hp),
@@ -739,6 +759,15 @@ function init() {
         cur.ry = lerp(cur.ry, tgt.ry, k);
         cur.rz = lerp(cur.rz, tgt.rz, k);
         cur.explode = lerp(cur.explode, explode, k);
+        if (glued) {
+            cur.y = tgt.y;
+            cur.s = tgt.s;
+        } else if (wasGlued) {
+            // Leaving the hero: rise into the anatomy from just below its spot.
+            cur.y = tgt.y - 0.5;
+            cur.s = tgt.s * 0.85;
+        }
+        wasGlued = glued;
         cur.mx = lerp(cur.mx, target.mx, k * 0.6);
         cur.my = lerp(cur.my, target.my, k * 0.6);
 
