@@ -58,8 +58,9 @@ const translations = {
         "c-title": "დაგვიკავშირდით",
         "c-desc": "მოგვწერეთ სოციალურ ქსელში ან დაგვირეკეთ ნებისმიერ დროს.",
         "map-title": "Fixmob.ge რუკაზე",
-        "footer-tag": "ტელეფონების პროფესიონალური შეკეთება",
-        "credit": "დიზაინი და დეველოპმენტი:"
+        "map-hl": "ka",
+        "map-open": "Google Maps-ში გახსნა",
+        "footer-tag": "ტელეფონების პროფესიონალური შეკეთება"
     },
     "en": {
         "nav-services": "Services",
@@ -117,8 +118,9 @@ const translations = {
         "c-title": "Contact Us",
         "c-desc": "Message us on social media or call us anytime.",
         "map-title": "Fixmob.ge on the map",
-        "footer-tag": "Professional Phone Repair",
-        "credit": "Designed & built by"
+        "map-hl": "en",
+        "map-open": "Open in Google Maps",
+        "footer-tag": "Professional Phone Repair"
     },
     "ru": {
         "nav-services": "Услуги",
@@ -176,7 +178,8 @@ const translations = {
         "c-title": "Свяжитесь с нами",
         "c-desc": "Пишите нам в социальных сетях или звоните в любое время.",
         "map-title": "Fixmob.ge на карте",
-        "footer-tag": "Профессиональный ремонт телефонов",
-        "credit": "Дизайн и разработка:"
+        "map-hl": "ru",
+        "map-open": "Открыть в Google Maps",
+        "footer-tag": "Профессиональный ремонт телефонов"
     }
 };

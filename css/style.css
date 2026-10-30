@@ -2091,9 +2091,18 @@ html.js [data-split].is-in .split-w > span {
   border: 1px solid var(--line-strong);
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 0.8rem;
   font-weight: 600;
-  pointer-events: none;
+  color: var(--text);
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.contact__map-pin:hover {
+  border-color: rgba(0, 210, 255, 0.55);
+  color: var(--accent);
 }
 
 /* ============================
@@ -2149,6 +2158,8 @@ html.js [data-split].is-in .split-w > span {
   line-height: 0.8;
   letter-spacing: -0.02em;
   user-select: none;
+  /* Giant glyph boxes overflow the line box and would swallow clicks on nearby links */
+  pointer-events: none;
 }
 
 .footer__mark span:first-child {
