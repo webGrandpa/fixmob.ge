@@ -993,8 +993,10 @@ html[lang='ru'] .hero-title {
 .hero-title .line {
   display: block;
   overflow: hidden;
-  padding: 0.04em 0 0.08em;
-  margin-bottom: -0.06em;
+  /* Generous padding so tall glyph tops and outline strokes aren't clipped
+     by the mask used for the rise-in; negative margins keep the rhythm. */
+  padding: 0.2em 0.04em 0.1em;
+  margin: -0.16em -0.04em -0.06em;
 }
 
 .hero-title .line__inner {
@@ -1174,7 +1176,7 @@ html[lang='ka'] .scroll-hint {
 
 /* Hero intro (after preloader) */
 html.js .hero-title .line__inner {
-  transform: translateY(110%);
+  transform: translateY(135%);
   transition: transform 1.3s var(--ease-out);
 }
 
@@ -1563,8 +1565,8 @@ html.js [data-reveal].is-in {
   display: inline-block;
   overflow: hidden;
   vertical-align: top;
-  padding: 0.06em 0 0.1em;
-  margin: -0.06em 0 -0.1em;
+  padding: 0.2em 0.04em 0.12em;
+  margin: -0.2em -0.04em -0.12em;
 }
 
 .split-w > span {
@@ -1572,7 +1574,7 @@ html.js [data-reveal].is-in {
 }
 
 html.js [data-split] .split-w > span {
-  translate: 0 110%;
+  translate: 0 135%;
   transition: translate 1.1s var(--ease-out);
   transition-delay: calc(var(--i, 0) * 55ms);
 }
