@@ -86,6 +86,23 @@ document.addEventListener('DOMContentLoaded', () => {
     })();
 
     // ================================
+    // Years in business / copyright year — derived from the date so the copy
+    // never goes stale. The HTML keeps the current values as a fallback.
+    // ================================
+    const FOUNDED = 2009;
+    const thisYear = new Date().getFullYear();
+    const yearsInBusiness = thisYear - FOUNDED;
+    document.querySelectorAll('[data-years]').forEach((el) => {
+        if ('count' in el.dataset) {
+            el.dataset.count = yearsInBusiness;
+            el.textContent = yearsInBusiness + (el.dataset.suffix || '');
+        } else {
+            el.textContent = yearsInBusiness;
+        }
+    });
+    document.querySelectorAll('[data-year]').forEach((el) => { el.textContent = thisYear; });
+
+    // ================================
     // 3. Hamburger Menu
     // ================================
     const hamburgerBtn = document.getElementById('hamburger-btn');

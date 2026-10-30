@@ -537,6 +537,13 @@ html:not([lang='ka']) .eyebrow {
   color: transparent;
 }
 
+/* background-clip:text only paints inside the box; pad it so tall glyph
+   tops and side bearings get colour, and cancel the padding with margins. */
+.hero-title .gradient-text {
+  padding: 0.2em 0.06em 0.12em;
+  margin: -0.2em -0.06em -0.12em;
+}
+
 .gradient-text--anim {
   background-image: linear-gradient(100deg, #3a7bd5 0%, #00d2ff 30%, #b9f3ff 50%, #00d2ff 70%, #3a7bd5 100%);
   background-size: 250% 100%;
