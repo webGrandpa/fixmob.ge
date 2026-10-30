@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="theme-color" content="#0a0e27" />
+        <meta name="theme-color" content="#07080a" />
         <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
         <meta name="author" content="Fixmob.ge" />
 
@@ -76,11 +76,28 @@
         <!-- Performance: preconnect & preload -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link rel="preload" as="image" href="/assets/hero.webp" fetchpriority="high" />
         <link
-            href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@300;400;600;800;900&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Georgian:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&display=swap"
             rel="stylesheet"
         />
+
+        <!-- Capability flags (set before first paint) -->
+        <script>
+            (function () {
+                var d = document.documentElement;
+                d.classList.add('js');
+                try {
+                    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                    var c = document.createElement('canvas');
+                    var gl = c.getContext('webgl2') || c.getContext('webgl');
+                    if (gl) {
+                        d.classList.add('webgl');
+                        var ext = gl.getExtension('WEBGL_lose_context');
+                        if (ext) ext.loseContext();
+                    }
+                } catch (e) {}
+            })();
+        </script>
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="/css/style.css" />
@@ -149,800 +166,476 @@
         </script>
     </head>
     <body>
-        <!-- Loading Screen -->
-        <div class="loading-screen" id="loading-screen">
-            <div class="loading-logo">
-                <span class="logo-fix">Fix</span
-                ><span class="logo-mob">Mob</span
-                ><span class="logo-ge">.ge</span>
+        <a class="skip-link" href="#main">Skip to content</a>
+
+        <!-- Preloader -->
+        <div class="preloader" id="preloader" aria-hidden="true">
+            <div class="preloader__inner">
+                <div class="preloader__logo">
+                    <span class="logo-fix">Fix</span><span class="logo-mob">Mob</span><span class="logo-ge">.ge</span>
+                </div>
+                <div class="preloader__bar"><span id="preloader-bar"></span></div>
+                <div class="preloader__meta">
+                    <span>Batumi · since 2009</span>
+                    <span class="preloader__count" id="preloader-count">0</span>
+                </div>
             </div>
-            <div class="loading-spinner"></div>
         </div>
+
+        <!-- Ambient background -->
+        <div class="ambient" aria-hidden="true"></div>
+        <div class="grain" aria-hidden="true"></div>
+
+        <!-- Cursor (desktop only) -->
+        <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"></div></div>
 
         <!-- Scroll Progress Bar -->
         <div class="scroll-progress" id="scroll-progress"></div>
 
         <!-- Header Navigation -->
         <header class="header" id="header">
-            <div class="container nav-container">
-                <!-- Logo -->
-                <a
-                    href="/en/"
-                    class="logo-wrapper"
-                    aria-label="Fixmob.ge - Home"
-                >
-                    <svg
-                        width="28"
-                        height="28"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        class="logo-svg"
-                        aria-hidden="true"
-                    >
+            <div class="header__bar">
+                <a href="/en/" class="logo-wrapper" aria-label="Fixmob.ge - Home">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="logo-svg" aria-hidden="true">
                         <defs>
-                            <linearGradient
-                                id="logo-grad"
-                                x1="0%"
-                                y1="0%"
-                                x2="100%"
-                                y2="100%"
-                            >
+                            <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#3a7bd5" />
                                 <stop offset="100%" stop-color="#00d2ff" />
                             </linearGradient>
                         </defs>
-                        <path
-                            stroke="url(#logo-grad)"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                        />
-                        <path
-                            stroke="#fff"
-                            stroke-width="2.5"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M10 10l2 2m0 0l2-2m-2 2v-4"
-                        />
+                        <path stroke="url(#logo-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        <path stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M10 10l2 2m0 0l2-2m-2 2v-4" />
                     </svg>
-                    <div class="logo-text">
-                        <span class="logo-fix">Fix</span
-                        ><span class="logo-mob">Mob</span
-                        ><span class="logo-ge">.ge</span>
-                    </div>
+                    <span class="logo-text"><span class="logo-fix">Fix</span><span class="logo-mob">Mob</span><span class="logo-ge">.ge</span></span>
                 </a>
 
-                <!-- Desktop Navigation -->
                 <nav class="desktop-nav" aria-label="Main navigation">
                     <ul class="nav-links">
-                        <li>
-                            <a
-                                href="#services"
-                                class="nav-link"
-                                data-i18n="nav-services"
-                                >Services</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                href="#about"
-                                class="nav-link"
-                                data-i18n="nav-about"
-                                >About Us</a
-                            >
-                        </li>
-                        <li>
-                            <a
-                                href="#why-us"
-                                class="nav-link"
-                                data-i18n="nav-why"
-                                >Advantages</a
-                            >
-                        </li>
-
-                        <!-- Language Switcher -->
-                        <li
-                            class="lang-switcher"
-                            role="group"
-                            aria-label="Language selection"
-                        >
-                            <a
-                                href="/"
-                                data-lang="ge"
-                                hreflang="ka"
-                                aria-label="ქართული"
-                                >GE</a
-                            >
-                            |
-                            <a href="/en/" data-lang="en" hreflang="en" class="active" aria-label="English"
-                                >EN</a
-                            >
-                            |
-                            <a href="/ru/" data-lang="ru" hreflang="ru" aria-label="Русский"
-                                >RU</a
-                            >
-                        </li>
+                        <li><a href="#services" class="nav-link">Services</a></li>
+                        <li><a href="#about" class="nav-link">About Us</a></li>
+                        <li><a href="#why-us" class="nav-link">Advantages</a></li>
                     </ul>
                 </nav>
 
-                <a
-                    href="#contact"
-                    class="header-cta btn-primary"
-                    data-i18n="nav-contact"
-                >
-                    Contact Us
-                </a>
-
-                <!-- Hamburger Menu Button -->
-                <button
-                    class="hamburger"
-                    id="hamburger-btn"
-                    aria-label="Menu"
-                    aria-expanded="false"
-                >
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
+                <div class="header__right">
+                    <div class="lang-switcher" role="group" aria-label="Language selection">
+                        <a href="/" data-lang="ge" hreflang="ka" aria-label="ქართული">GE</a>
+                        <a href="/en/" data-lang="en" hreflang="en" aria-label="English" class="active" aria-current="page">EN</a>
+                        <a href="/ru/" data-lang="ru" hreflang="ru" aria-label="Русский">RU</a>
+                    </div>
+                    <a href="#contact" class="header-cta btn-primary" data-magnetic><span>Contact Us</span></a>
+                    <button class="hamburger" id="hamburger-btn" aria-label="Menu" aria-expanded="false" aria-controls="mobile-nav">
+                        <span></span><span></span>
+                    </button>
+                </div>
             </div>
         </header>
 
         <!-- Mobile Navigation Overlay -->
         <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
             <div class="mobile-nav-links">
-                <a
-                    href="#services"
-                    class="mobile-nav-link"
-                    data-i18n="nav-services"
-                    >Services</a
-                >
-                <a href="#about" class="mobile-nav-link" data-i18n="nav-about"
-                    >About Us</a
-                >
-                <a href="#why-us" class="mobile-nav-link" data-i18n="nav-why"
-                    >Advantages</a
-                >
-                <a
-                    href="#contact"
-                    class="mobile-nav-link"
-                    data-i18n="nav-contact"
-                    >Contact Us</a
-                >
+                <a href="#services" class="mobile-nav-link"><span class="mobile-nav-num">01</span>Services</a>
+                <a href="#about" class="mobile-nav-link"><span class="mobile-nav-num">02</span>About Us</a>
+                <a href="#why-us" class="mobile-nav-link"><span class="mobile-nav-num">03</span>Advantages</a>
+                <a href="#contact" class="mobile-nav-link"><span class="mobile-nav-num">04</span>Contact Us</a>
             </div>
-            <div
-                class="mobile-lang-switcher"
-                role="group"
-                aria-label="Language selection"
-            >
-                <a href="/" data-lang="ge" hreflang="ka" aria-label="ქართული"
-                    >GE</a
-                >
-                <a href="/en/" data-lang="en" hreflang="en" class="active" aria-label="English">EN</a>
-                <a href="/ru/" data-lang="ru" hreflang="ru" aria-label="Русский">RU</a>
+            <div class="mobile-nav-foot">
+                <div class="mobile-lang-switcher" role="group" aria-label="Language selection">
+                    <a href="/" data-lang="ge" hreflang="ka" aria-label="ქართული">GE</a>
+                    <a href="/en/" data-lang="en" hreflang="en" aria-label="English" class="active" aria-current="page">EN</a>
+                    <a href="/ru/" data-lang="ru" hreflang="ru" aria-label="Русский">RU</a>
+                </div>
+                <a href="tel:+995596100011" class="mobile-nav-phone">+995 596 100 011</a>
             </div>
-            <a
-                href="#contact"
-                class="mobile-nav-cta btn-primary"
-                data-i18n="hero-btn"
-                >Book Appointment</a
-            >
         </nav>
 
-        <!-- Hero Section -->
-        <section class="center-hero container">
-            <!-- Floating Particles -->
-            <div class="hero-particles" aria-hidden="true">
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
-                <div class="particle"></div>
+        <main id="main">
+            <!-- ============ 3D Stage: Hero + Anatomy ============ -->
+            <div class="stage">
+                <div class="stage__canvas" aria-hidden="true">
+                    <div class="stage__sticky">
+                        <div class="stage__glow"></div>
+                        <canvas id="phone-canvas"></canvas>
+                    </div>
+                </div>
+
+                <!-- Hero -->
+                <section class="hero" aria-labelledby="hero-title">
+                    <div class="container hero__inner">
+                        <div class="hero__content">
+                            <p class="eyebrow hero__eyebrow" data-hero-intro>
+                                <span class="live-dot" aria-hidden="true"></span>Batumi · Since 2009
+                            </p>
+                            <h1 class="hero-title" id="hero-title">
+                                <span class="line"><span class="line__inner">Professional</span></span>
+                                <span class="line"><span class="line__inner gradient-text gradient-text--anim">Phone</span></span>
+                                <span class="line"><span class="line__inner outline-text">Repair</span></span>
+                            </h1>
+                            <p class="hero-subtitle" data-hero-intro>Fast service, free diagnostics and original parts. We repair <strong>all brands (Apple, Samsung, Xiaomi and more)</strong> — any issue, any complexity.</p>
+
+                            <div class="hero-buttons" data-hero-intro>
+                                <a href="#contact" class="btn-primary btn-lg" data-magnetic>
+                                    <span>Book Appointment</span>
+                                    <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14m-6-6l6 6-6 6" /></svg>
+                                </a>
+                                <a href="tel:+995596100011" class="btn-ghost btn-lg" data-magnetic>
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="20" height="20" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                    <span>Call us</span>
+                                </a>
+                            </div>
+
+                            <ul class="trust-row" data-hero-intro>
+                                <li class="trust-item">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                                    Warranty on Parts
+                                </li>
+                                <li class="trust-item">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    17+ Years Experience
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="hero__visual">
+                            <img src="/assets/hero.webp" alt="Smartphone repair — exploded view" class="hero__fallback" width="1408" height="768" />
+                            <div class="float-chip float-chip--1" aria-hidden="true">
+                                <span class="float-chip__icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></span>
+                                <span><strong>Free Diagnostics</strong><small>0 ₾</small></span>
+                            </div>
+                            <div class="float-chip float-chip--2" aria-hidden="true">
+                                <span class="float-chip__icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></span>
+                                <span><strong>Fast Service</strong><small>Apple · Samsung · Xiaomi</small></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scroll-hint" aria-hidden="true">
+                        <span class="scroll-hint__mouse"><span></span></span>
+                        <span class="scroll-hint__label">Scroll</span>
+                    </div>
+                </section>
+
+                <!-- Anatomy (scroll-driven exploded view) -->
+                <section class="anatomy" id="anatomy" aria-labelledby="anatomy-title">
+                    <div class="anatomy__sticky">
+                        <div class="container anatomy__layout">
+                            <div class="anatomy__head">
+                                <p class="eyebrow">Phone anatomy</p>
+                                <h2 class="anatomy__title" id="anatomy-title">We know every layer of your phone</h2>
+                                <p class="anatomy__hint">
+                                    <span class="anatomy__hint-line" aria-hidden="true"></span>Scroll to take it apart
+                                </p>
+                            </div>
+
+                            <ol class="anatomy__steps">
+                                <li class="anatomy__step">
+                                    <span class="anatomy__num">01 <i>/ 04</i></span>
+                                    <h3>Screen Replacement</h3>
+                                    <p>Replacement of damaged, cracked or unresponsive touch screens.</p>
+                                </li>
+                                <li class="anatomy__step">
+                                    <span class="anatomy__num">02 <i>/ 04</i></span>
+                                    <h3>Motherboard Repair</h3>
+                                    <p>Diagnostics and restoration of complex microcircuits.</p>
+                                </li>
+                                <li class="anatomy__step">
+                                    <span class="anatomy__num">03 <i>/ 04</i></span>
+                                    <h3>Battery Replacement</h3>
+                                    <p>Replacement of damaged batteries with new originals.</p>
+                                </li>
+                                <li class="anatomy__step">
+                                    <span class="anatomy__num">04 <i>/ 04</i></span>
+                                    <h3>Water Damage</h3>
+                                    <p>Chemical cleaning of the phone and solving liquid-caused problems.</p>
+                                </li>
+                            </ol>
+
+                            <div class="anatomy__progress" aria-hidden="true">
+                                <span class="anatomy__tick"></span>
+                                <span class="anatomy__tick"></span>
+                                <span class="anatomy__tick"></span>
+                                <span class="anatomy__tick"></span>
+                            </div>
+
+                            <div class="anatomy__done">
+                                <span class="anatomy__done-icon" aria-hidden="true">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                </span>
+                                <div>
+                                    <p class="anatomy__done-title">Repaired</p>
+                                    <p class="anatomy__done-desc">With original parts and a warranty.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hotspots" aria-hidden="true">
+                            <span class="hotspot"><span class="hotspot__dot"></span><span class="hotspot__label">01</span></span>
+                            <span class="hotspot"><span class="hotspot__dot"></span><span class="hotspot__label">02</span></span>
+                            <span class="hotspot"><span class="hotspot__dot"></span><span class="hotspot__label">03</span></span>
+                            <span class="hotspot"><span class="hotspot__dot"></span><span class="hotspot__label">04</span></span>
+                        </div>
+                    </div>
+                </section>
             </div>
 
-            <!-- Hero Image -->
-            <div class="hero-visual-large">
-                <img
-                    src="/assets/hero.webp"
-                    alt="Smartphone repair — exploded view"
-                    class="hero-image-large"
-                    width="600"
-                    height="600"
-                    fetchpriority="high"
-                />
+            <!-- ============ Services ============ -->
+            <section id="services" class="section services">
+                <div class="container">
+                    <div class="section-head">
+                        <p class="eyebrow" data-reveal>What we do</p>
+                        <h2 class="section-title" data-split>Our Services</h2>
+                        <p class="section-desc" data-reveal>We fix everything, from simple screen replacements to complex motherboard repair.</p>
+                    </div>
+
+                    <div class="bento">
+                        <article class="svc svc--hero" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">01</span>
+                                <h3>Screen Replacement</h3>
+                                <p>Replacement of damaged, cracked or unresponsive touch screens.</p>
+                            </div>
+                            <img class="svc__media" src="/assets/parts/screen.webp" alt="" width="340" height="640" loading="lazy" />
+                        </article>
+
+                        <article class="svc" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">02</span>
+                                <h3>Battery Replacement</h3>
+                                <p>Replacement of damaged batteries with new originals.</p>
+                            </div>
+                            <img class="svc__media" src="/assets/parts/back.webp" alt="" width="300" height="600" loading="lazy" />
+                        </article>
+
+                        <article class="svc" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">03</span>
+                                <h3>Water Damage</h3>
+                                <p>Chemical cleaning of the phone and solving liquid-caused problems.</p>
+                            </div>
+                            <img class="svc__media" src="/assets/parts/frame.webp" alt="" width="200" height="640" loading="lazy" />
+                        </article>
+
+                        <article class="svc" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">04</span>
+                                <h3>Motherboard Repair</h3>
+                                <p>Diagnostics and restoration of complex microcircuits.</p>
+                            </div>
+                            <img class="svc__media" src="/assets/parts/board.webp" alt="" width="216" height="620" loading="lazy" />
+                        </article>
+
+                        <article class="svc svc--code" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">05</span>
+                                <h3>Software Issues</h3>
+                                <p>Unlocking, system reinstall and fixing software bugs.</p>
+                            </div>
+                            <div class="svc__code" aria-hidden="true">
+                                <span>&gt; diagnose --all</span>
+                                <span class="ok">✓ system restored</span>
+                                <span>&gt; unlock --safe<i class="caret"></i></span>
+                            </div>
+                        </article>
+
+                        <article class="svc" data-reveal data-spotlight data-tilt>
+                            <div class="svc__body">
+                                <span class="svc__index">06</span>
+                                <h3>Other Services</h3>
+                                <p>Any brand, any kind of damage — fixed completely.</p>
+                            </div>
+                            <img class="svc__media" src="/assets/parts/case.webp" alt="" width="210" height="640" loading="lazy" />
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Brands marquee ============ -->
+            <div class="marquee" aria-label="Brands we repair">
+                <div class="marquee__row" data-marquee>
+                    <div class="marquee__track">
+                        <span>Apple</span><i>✦</i><span class="o">Samsung</span><i>✦</i><span>Xiaomi</span><i>✦</i><span class="o">Google Pixel</span><i>✦</i><span>Huawei</span><i>✦</i><span class="o">OnePlus</span><i>✦</i><span>Honor</span><i>✦</i><span class="o">Oppo</span><i>✦</i>
+                    </div>
+                </div>
+                <div class="marquee__row marquee__row--rev" data-marquee aria-hidden="true">
+                    <div class="marquee__track">
+                        <span class="o">Motorola</span><i>✦</i><span>Realme</span><i>✦</i><span class="o">Vivo</span><i>✦</i><span>Nokia</span><i>✦</i><span class="o">Sony</span><i>✦</i><span>Poco</span><i>✦</i><span class="o">Redmi</span><i>✦</i><span>iPhone</span><i>✦</i>
+                    </div>
+                </div>
             </div>
 
-            <!-- Hero Text -->
-            <div class="hero-text-center">
-                <h1 class="hero-title">
-                    <span data-i18n="hero-t">Phone</span>
-                    <span class="gradient-text" data-i18n="hero-g"
-                        >Professional</span
-                    >
-                    <span data-i18n="hero-r">Repair</span>
-                </h1>
-                <p class="hero-subtitle" data-i18n="hero-s">
-                    Fast service, free diagnostic &amp; original parts.<br />
-                    We service
-                    <strong
-                        >all brands (Apple, Samsung, Xiaomi, etc.)</strong
-                    >
-                    regarding any complex issues.
-                </p>
+            <!-- ============ About ============ -->
+            <section id="about" class="section about">
+                <div class="container about__grid">
+                    <div class="about__visual">
+                        <div class="about__frame" data-clip-reveal>
+                            <img src="/assets/about-us.webp" alt="Fixmob.ge Batumi service center — repair process" width="1272" height="768" loading="lazy" data-parallax-img />
+                        </div>
+                        <div class="seal" aria-hidden="true">
+                            <svg viewBox="0 0 120 120">
+                                <defs><path id="seal-circle" d="M60,60 m-46,0 a46,46 0 1,1 92,0 a46,46 0 1,1 -92,0" /></defs>
+                                <text><textPath href="#seal-circle">FIXMOB · SINCE 2009 · BATUMI · FIXMOB · SINCE 2009 ·</textPath></text>
+                            </svg>
+                            <span class="seal__year">17+</span>
+                        </div>
+                    </div>
 
-                <div class="hero-buttons">
-                    <a
-                        href="#contact"
-                        class="hero-cta btn-primary"
-                        data-i18n="hero-btn"
-                    >
-                        Book Appointment
+                    <div class="about__content">
+                        <p class="eyebrow" data-reveal>Since 2009</p>
+                        <h2 class="section-title" data-split>About Us</h2>
+                        <p class="about__lead" data-reveal>Fixmob.ge is a premium service center in Batumi. We have been repairing mobile phones since 2009, focused on extending the life of your technology. Our team unites highly qualified engineers with over 17 years of hands-on experience.</p>
+                        <p data-reveal>Our goal is to create a service where technical difficulties are solved simply and transparently. We care about every detail and use only the best certified technological equipment.</p>
+
+                        <div class="stats">
+                            <div class="stat" data-reveal>
+                                <span class="stat__num" data-count="17" data-suffix="+">17+</span>
+                                <span class="stat__label">Years on Market</span>
+                            </div>
+                            <div class="stat" data-reveal>
+                                <span class="stat__num" data-count="10" data-suffix="k+">10k+</span>
+                                <span class="stat__label">Devices Repaired</span>
+                            </div>
+                            <div class="stat" data-reveal>
+                                <span class="stat__num">0<small>₾</small></span>
+                                <span class="stat__label">Diagnostics</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Why Us ============ -->
+            <section id="why-us" class="section why">
+                <div class="container">
+                    <div class="section-head">
+                        <p class="eyebrow" data-reveal>Advantages</p>
+                        <h2 class="section-title" data-split>Why Choose Us?</h2>
+                        <p class="section-desc" data-reveal>Choose quality and reliability in one place.</p>
+                    </div>
+
+                    <div class="why__stack">
+                        <article class="why-card" data-spotlight>
+                            <div class="why-card__text">
+                                <span class="why-card__num">01</span>
+                                <h3>Free Diagnostics</h3>
+                                <p>You don't pay for the check-up! We find the exact cause of the problem, and only then do you decide on the repair.</p>
+                            </div>
+                            <div class="why-card__art" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </div>
+                        </article>
+                        <article class="why-card" data-spotlight>
+                            <div class="why-card__text">
+                                <span class="why-card__num">02</span>
+                                <h3>Original Parts</h3>
+                                <p>We use only the highest quality, original spare parts, backed by a full warranty.</p>
+                            </div>
+                            <div class="why-card__art" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                            </div>
+                        </article>
+                        <article class="why-card" data-spotlight>
+                            <div class="why-card__text">
+                                <span class="why-card__num">03</span>
+                                <h3>Fast Service</h3>
+                                <p>No waiting for days. Most repairs are done right here in our service center, quickly!</p>
+                            </div>
+                            <div class="why-card__art" aria-hidden="true">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ Contact ============ -->
+            <section id="contact" class="section contact">
+                <div class="container">
+                    <div class="contact__panel" data-reveal>
+                        <div class="contact__info">
+                            <p class="eyebrow">Ready to help</p>
+                            <h2 class="contact__title" data-split>Contact Us</h2>
+                            <p class="contact__desc">Message us on social media or call us anytime.</p>
+
+                            <a href="tel:+995596100011" class="contact__phone" data-magnetic aria-label="Call us: +995 596 100 011">
+                                <span class="contact__phone-icon" aria-hidden="true">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="22" height="22"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                                </span>
+                                <span class="contact__phone-num">+995 596 100 011</span>
+                            </a>
+
+                            <div class="messenger-links">
+                                <a href="https://wa.me/995596100011" class="messenger-btn whatsapp" target="_blank" rel="noopener" aria-label="WhatsApp">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                                    WhatsApp
+                                </a>
+                                <a href="viber://chat?number=995596100011" class="messenger-btn viber" aria-label="Viber">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M11.398.002C9.47.028 5.263.344 3.056 2.533 1.39 4.199.763 6.628.7 9.608c-.064 2.98-.146 8.568 5.244 10.078l.004.003s-.003 2.388-.002 2.716c0 .218.098.573.413.573.254 0 .405-.162.651-.415.487-.503 1.732-1.816 2.494-2.647 3.328.27 5.883-.34 6.175-.44.675-.229 4.493-.709 5.118-5.793.647-5.256-.312-8.553-2.054-10.027C17.3 2.382 11.4.002 11.4.002zM12 2.295s5.09.236 6.31 3.14c.48 1.13.418 3.616.418 3.616s.051 2.098-.48 2.843c-.36.506-.73.51-1.063.54-.334.03-2.15.285-3.297-.45-.32-.205-.58-.495-.738-.854a12.270 12.270 0 01-.393-1.240c.18.045.367.078.558.098.643.067 1.235-.016 1.748-.272.193-.096.36-.22.484-.384l-.07-.076c-.345.223-.748.35-1.207.387a4.38 4.38 0 01-1.55-.15 3.05 3.05 0 01-.626-.265 3.65 3.65 0 01-.09-.053l-.058-.038-.025-.016a3.34 3.34 0 01-1.345-2.31c-.067-.437-.04-.877.075-1.3.115-.424.329-.82.626-1.142a2.05 2.05 0 011.04-.63c.38-.1.788-.055 1.14.14.262.143.473.36.603.63.13.27.173.575.123.87a1.41 1.41 0 01-.41.756c-.2.195-.46.311-.733.325a.87.87 0 01-.62-.206.71.71 0 01-.228-.54l-.05-.007c-.03.257.064.513.258.694.25.234.587.34.92.29a1.7 1.7 0 001.1-.632c.27-.33.403-.755.362-1.18a1.79 1.79 0 00-.63-1.168 2.15 2.15 0 00-1.37-.474c-.547.01-1.07.21-1.472.563-.485.427-.793 1.024-.87 1.682-.075.659.085 1.33.46 1.874.526.768 1.327 1.302 2.25 1.5.615.132 1.254.106 1.858-.078.12-.036.237-.08.35-.132.31.83.664 1.553 1.11 2.01.69.703 1.44.59 1.8.45.36-.14 2.85-1.166 3.05-3.590.2-2.425-.03-5.558-2.54-7.21C15.06 3.44 12 2.295 12 2.295z" /></svg>
+                                    Viber
+                                </a>
+                                <a href="mailto:Fixmob2009@gmail.com" class="icon-btn" aria-label="Email">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                </a>
+                                <a href="https://www.instagram.com/fixmob2009?igsh=MXczZGtiNHY5MzI2aA%3D%3D&amp;utm_source=qr" class="icon-btn" target="_blank" rel="noopener" aria-label="Instagram">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.203 4.358 2.618 6.78 6.98 6.98 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" /></svg>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="contact__map">
+                            <iframe title="Fixmob.ge on the map" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d372.67156602098134!2d41.63858467879059!3d41.64769253232006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sge!4v1776423997320!5m2!1sen!2sge" width="600" height="450" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                            <span class="contact__map-pin" aria-hidden="true">Fixmob.ge · Batumi</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="container">
+                <div class="footer__top">
+                    <p class="footer__since"><span class="since">since 2009 - now</span></p>
+                    <nav class="footer__nav" aria-label="Footer navigation">
+                        <a href="#services">Services</a>
+                        <a href="#about">About Us</a>
+                        <a href="#why-us">Advantages</a>
+                        <a href="#contact">Contact Us</a>
+                    </nav>
+                </div>
+                <div class="footer__mark" aria-hidden="true"><span>FIX</span><span>MOB</span></div>
+                <div class="footer__bottom">
+                    <p>&copy; 2026 Fixmob.ge — Professional Phone Repair</p>
+                    <a class="credit" href="https://github.com/webGrandpa" target="_blank" rel="noopener author">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12" /></svg>
+                        <span>Designed & built by <strong>webGrandpa</strong></span>
                     </a>
-
-                    <!-- Trust Badges -->
-                    <div class="trust-center">
-                        <div class="badge glass-card animate-on-scroll">
-                            <div class="badge-icon-wrap">
-                                <svg
-                                    class="badge-icon"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                                    />
-                                </svg>
-                            </div>
-                            <span data-i18n="b1">Warranty on Parts</span>
-                        </div>
-                        <div class="badge glass-card animate-on-scroll">
-                            <div class="badge-icon-wrap">
-                                <svg
-                                    class="badge-icon"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                                    />
-                                </svg>
-                            </div>
-                            <span data-i18n="b2">17+ Years Experience</span>
-                        </div>
+                    <div class="footer__langs">
+                        <a href="/" hreflang="ka">GE</a>
+                        <a href="/en/" hreflang="en" class="active" aria-current="page">EN</a>
+                        <a href="/ru/" hreflang="ru">RU</a>
                     </div>
                 </div>
             </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- Services Section -->
-        <section id="services" class="services-section">
-            <div class="container">
-                <div class="section-header animate-on-scroll">
-                    <h2 class="section-title title-box" data-i18n="s-title">
-                        Our Services
-                    </h2>
-                    <p class="section-desc" data-i18n="s-desc">
-                        We fix everything, from simple screen replacements to
-                        complex motherboard repair.
-                    </p>
-                </div>
-
-                <div class="services-grid">
-                    <!-- 1 -->
-                    <div
-                        class="service-card glass-card glass-card-hover animate-on-scroll stagger-1"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s1-t">Screen Replacement</h3>
-                        <p data-i18n="s1-d">
-                            Replacement of damaged, cracked or broken sensor screens.
-                        </p>
-                    </div>
-
-                    <!-- 2 -->
-                    <div
-                        class="service-card glass-card glass-card-hover animate-on-scroll stagger-2"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M4 11a1 1 0 011-1h12a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM3 13h2M19 13h2"
-                                />
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M9 14h2"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s2-t">Battery Replacement</h3>
-                        <p data-i18n="s2-d">
-                            Replacement of damaged batteries with new originals.
-                        </p>
-                    </div>
-
-                    <!-- 3 -->
-                    <div
-                        class="service-card glass-card glass-card-hover animate-on-scroll stagger-3"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s3-t">Water Damage</h3>
-                        <p data-i18n="s3-d">
-                            Chemical cleaning of the phone and solving liquid-caused problems.
-                        </p>
-                    </div>
-
-                    <!-- 4 -->
-                    <div
-                        class="service-card glass-card glass-card-hover animate-on-scroll stagger-4"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s4-t">Motherboard Repair</h3>
-                        <p data-i18n="s4-d">
-                            Diagnostics and restoration of complex microcircuits.
-                        </p>
-                    </div>
-
-                    <!-- 5 -->
-                    <div
-                        class="service-card glass-card glass-card-hover animate-on-scroll stagger-5"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s5-t">Software Issues</h3>
-                        <p data-i18n="s5-d">
-                            Unlocking, system reinstall and fixing software bugs.
-                        </p>
-                    </div>
-
-                    <!-- 6 -->
-                    <div
-                        class="service-card glass-card glass-card-hover service-all animate-on-scroll stagger-6"
-                    >
-                        <div class="service-icon">
-                            <svg
-                                class="s-icon"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                                />
-                            </svg>
-                        </div>
-                        <h3 data-i18n="s6-t">Other Services</h3>
-                        <p data-i18n="s6-d">
-                            Elimination of any damage for any brand completely.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- About Us Section -->
-        <section id="about" class="about-section container">
-            <div class="about-grid">
-                <div class="about-content animate-on-scroll">
-                    <h2
-                        class="section-title title-box about-us-title"
-                        data-i18n="a-title"
-                    >
-                        About Us
-                    </h2>
-                    <p data-i18n="a-p1">
-                        Fixmob.ge is a premium service center in Batumi. We
-                        have been repairing mobile phones since 2009, focused
-                        on extending the life of your technology. Our team
-                        unites highly qualified engineers with over 17 years of
-                        hands-on experience.
-                    </p>
-                    <p data-i18n="a-p2">
-                        Our goal is to create a service where technical
-                        difficulties are solved simply and transparently. We
-                        care about every detail and use only the best certified
-                        technological equipment.
-                    </p>
-
-                    <div class="about-stats">
-                        <div
-                            class="stat-box glass-card animate-on-scroll stagger-1"
-                        >
-                            <span
-                                class="stat-num"
-                                data-count="17"
-                                data-i18n="a-s1"
-                                >17+</span
-                            >
-                            <span class="stat-title" data-i18n="a-s1t"
-                                >Years on Market</span
-                            >
-                        </div>
-                        <div
-                            class="stat-box glass-card animate-on-scroll stagger-2"
-                        >
-                            <span
-                                class="stat-num"
-                                data-count="10000"
-                                data-i18n="a-s2"
-                                >10k+</span
-                            >
-                            <span class="stat-title" data-i18n="a-s2t"
-                                >Devices Repaired</span
-                            >
-                        </div>
-                    </div>
-                </div>
-
-                <div class="about-visual glass-card animate-scale">
-                    <div class="about-glow"></div>
-                    <img
-                        src="/assets/about-us.webp"
-                        alt="Fixmob.ge Batumi service center — repair process"
-                        width="600"
-                        height="450"
-                        loading="lazy"
-                    />
-                </div>
-            </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- Why Us Section -->
-        <section id="why-us" class="why-us-section">
-            <div class="container">
-                <div class="section-header animate-on-scroll">
-                    <h2 class="section-title title-box" data-i18n="w-title">
-                        Why Choose Us?
-                    </h2>
-                    <p class="section-desc" data-i18n="w-desc">
-                        Choose quality and reliability in one place.
-                    </p>
-                </div>
-
-                <div class="why-grid">
-                    <!-- Why 1 -->
-                    <div
-                        class="why-card glass-card glass-card-hover animate-on-scroll stagger-1"
-                    >
-                        <span class="why-number" aria-hidden="true">01</span>
-                        <svg
-                            class="why-card-icon"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                            />
-                        </svg>
-                        <h3 data-i18n="w1-t">Free Diagnostic</h3>
-                        <p data-i18n="w1-d">
-                            You don't pay for checking! We will diagnose the
-                            problem accurately and then you decide on repair.
-                        </p>
-                    </div>
-
-                    <!-- Why 2 -->
-                    <div
-                        class="why-card glass-card glass-card-hover animate-on-scroll stagger-2"
-                    >
-                        <span class="why-number" aria-hidden="true">02</span>
-                        <svg
-                            class="why-card-icon"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                            />
-                        </svg>
-                        <h3 data-i18n="w2-t">Original Parts</h3>
-                        <p data-i18n="w2-d">
-                            We use only the highest quality, original spare
-                            parts, backed by a full warranty.
-                        </p>
-                    </div>
-
-                    <!-- Why 3 -->
-                    <div
-                        class="why-card glass-card glass-card-hover animate-on-scroll stagger-3"
-                    >
-                        <span class="why-number" aria-hidden="true">03</span>
-                        <svg
-                            class="why-card-icon"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                            aria-hidden="true"
-                        >
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M13 10V3L4 14h7v7l9-11h-7z"
-                            />
-                        </svg>
-                        <h3 data-i18n="w3-t">Fast Service</h3>
-                        <p data-i18n="w3-d">
-                            No waiting for days. Most repairs are done locally
-                            in our service center, quickly!
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <hr class="section-divider" />
-
-        <!-- Contact & Map Section -->
-        <section id="contact" class="contact-section container">
-            <div class="contact-grid">
-                <!-- Contact Info -->
-                <div class="contact-info-wrap">
-                    <h2 data-i18n="c-title">Contact Us</h2>
-                    <p data-i18n="c-desc">
-                        Message us on social media or call us anytime.
-                    </p>
-
-                    <div class="contact-actions">
-                        <!-- Phone -->
-                        <a
-                            href="tel:+995596100011"
-                            class="contact-btn btn-primary"
-                            aria-label="Call"
-                        >
-                            <svg
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                width="22"
-                                height="22"
-                                aria-hidden="true"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                                />
-                            </svg>
-                            +995 596 100 011
-                        </a>
-
-                        <!-- Messenger Links (WhatsApp + Viber) -->
-                        <div class="messenger-links">
-                            <a
-                                href="https://wa.me/995596100011"
-                                class="messenger-btn whatsapp"
-                                target="_blank"
-                                rel="noopener"
-                                aria-label="WhatsApp"
-                            >
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"
-                                    />
-                                </svg>
-                                WhatsApp
-                            </a>
-                            <a
-                                href="viber://chat?number=995596100011"
-                                class="messenger-btn viber"
-                                aria-label="Viber"
-                            >
-                                <svg
-                                    width="20"
-                                    height="20"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M11.398.002C9.47.028 5.263.344 3.056 2.533 1.39 4.199.763 6.628.7 9.608c-.064 2.98-.146 8.568 5.244 10.078l.004.003s-.003 2.388-.002 2.716c0 .218.098.573.413.573.254 0 .405-.162.651-.415.487-.503 1.732-1.816 2.494-2.647 3.328.27 5.883-.34 6.175-.44.675-.229 4.493-.709 5.118-5.793.647-5.256-.312-8.553-2.054-10.027C17.3 2.382 11.4.002 11.4.002zM12 2.295s5.09.236 6.31 3.14c.48 1.13.418 3.616.418 3.616s.051 2.098-.48 2.843c-.36.506-.73.51-1.063.54-.334.03-2.15.285-3.297-.45-.32-.205-.58-.495-.738-.854a12.27 12.27 0 01-.393-1.24c.18.045.367.078.558.098.643.067 1.235-.016 1.748-.272.193-.096.36-.22.484-.384l-.07-.076c-.345.223-.748.35-1.207.387a4.38 4.38 0 01-1.55-.15 3.05 3.05 0 01-.626-.265 3.65 3.65 0 01-.09-.053l-.058-.038-.025-.016a3.34 3.34 0 01-1.345-2.31c-.067-.437-.04-.877.075-1.3.115-.424.329-.82.626-1.142a2.05 2.05 0 011.04-.63c.38-.1.788-.055 1.14.14.262.143.473.36.603.63.13.27.173.575.123.87a1.41 1.41 0 01-.41.756c-.2.195-.46.311-.733.325a.87.87 0 01-.62-.206.71.71 0 01-.228-.54l-.05-.007c-.03.257.064.513.258.694.25.234.587.34.92.29a1.7 1.7 0 001.1-.632c.27-.33.403-.755.362-1.18a1.79 1.79 0 00-.63-1.168 2.15 2.15 0 00-1.37-.474c-.547.01-1.07.21-1.472.563-.485.427-.793 1.024-.87 1.682-.075.659.085 1.33.46 1.874.526.768 1.327 1.302 2.25 1.5.615.132 1.254.106 1.858-.078.12-.036.237-.08.35-.132.31.83.664 1.553 1.11 2.01.69.703 1.44.59 1.8.45.36-.14 2.85-1.166 3.05-3.59.2-2.425-.03-5.558-2.54-7.21C15.06 3.44 12 2.295 12 2.295z"
-                                    />
-                                </svg>
-                                Viber
-                            </a>
-                        </div>
-
-                        <div class="social-links">
-                            <!-- Email -->
-                            <a
-                                href="mailto:Fixmob2009@gmail.com"
-                                class="social-btn glass-button"
-                                aria-label="Email"
-                            >
-                                <svg
-                                    width="22"
-                                    height="22"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                                    />
-                                </svg>
-                            </a>
-                            <!-- Instagram -->
-                            <a
-                                href="https://www.instagram.com/fixmob2009?igsh=MXczZGtiNHY5MzI2aA%3D%3D&utm_source=qr"
-                                class="social-btn glass-button"
-                                aria-label="Instagram"
-                            >
-                                <svg
-                                    width="22"
-                                    height="22"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                    aria-hidden="true"
-                                >
-                                    <path
-                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.203 4.358 2.618 6.78 6.98 6.98 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"
-                                    />
-                                </svg>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Map -->
-                <div class="map-container">
-                    <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d372.67156602098134!2d41.63858467879059!3d41.64769253232006!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sge!4v1776423997320!5m2!1sen!2sge"
-                        width="600"
-                        height="450"
-                        style="border: 0"
-                        allowfullscreen=""
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        title="Fixmob.ge location in Batumi"
-                    ></iframe>
-                </div>
-            </div>
-        </section>
-
-        <footer class="footer container">
-            <p data-i18n="footer">
-                <span class="since">since 2009 - now</span> <br>
-                &copy; 2026 Fixmob.ge - Professional Phone Repair
-            </p>
         </footer>
 
+        <!-- Mobile quick-contact dock -->
+        <div class="dock" id="dock">
+            <a href="tel:+995596100011" class="dock__btn dock__btn--call">
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>
+                Call us
+            </a>
+            <a href="https://wa.me/995596100011" class="dock__btn dock__btn--wa" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+
         <!-- Back to Top Button -->
-        <button
-            class="back-to-top"
-            id="back-to-top"
-            aria-label="Back to top"
-        >
-            <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                aria-hidden="true"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2.5"
-                    d="M5 15l7-7 7 7"
-                />
-            </svg>
+        <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7" /></svg>
         </button>
 
         <!-- Scripts -->
-        <script src="/js/lang.js" defer></script>
+        <script src="/js/vendor/gsap.min.js" defer></script>
+        <script src="/js/vendor/ScrollTrigger.min.js" defer></script>
+        <script src="/js/vendor/lenis.min.js" defer></script>
         <script src="/js/script.js" defer></script>
+        <script type="module" src="/js/phone3d.js"></script>
     </body>
 </html>
