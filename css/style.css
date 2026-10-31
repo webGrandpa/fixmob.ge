@@ -978,22 +978,29 @@ html:not(.webgl) .stage__canvas {
 
 .hero__content {
   max-width: 660px;
+  container-type: inline-size;
 }
 
+/* Headline size follows the copy column (cqi), not the viewport, so the longest
+   word always fits: ka "პროფესიონალური" ≈ 5.0em, en "Professional" ≈ 5.9em,
+   ru "Профессиональный" ≈ 9.4em wide. The vw values are a fallback. */
 .hero-title {
   margin: 26px 0 28px;
   font-size: clamp(3rem, 6.2vw, 6.4rem);
+  font-size: min(6.4rem, 18.5cqi);
   line-height: 0.92;
   letter-spacing: 0.005em;
 }
 
 html[lang='en'] .hero-title {
-  font-size: clamp(3.2rem, 7.6vw, 7.6rem);
+  font-size: clamp(2.6rem, 6vw, 6.4rem);
+  font-size: min(7.6rem, 16cqi);
   line-height: 0.88;
 }
 
 html[lang='ru'] .hero-title {
-  font-size: clamp(2.5rem, 5.6vw, 5.8rem);
+  font-size: clamp(2rem, 4.2vw, 4rem);
+  font-size: min(5.8rem, 10cqi);
   line-height: 0.92;
 }
 
@@ -1243,13 +1250,18 @@ html.is-loaded .scroll-hint { transition-delay: 1.1s; }
   position: absolute;
   top: calc(var(--header-h) + 50px);
   left: var(--gutter);
-  max-width: 520px;
+  /* Stay left of the phone, whose front-facing parts swing toward centre */
+  max-width: min(480px, 36vw);
 }
 
 .anatomy__title {
   margin-top: 18px;
   font-size: clamp(2.2rem, 4.2vw, 3.8rem);
   line-height: 0.98;
+}
+
+html[lang='ru'] .anatomy__title {
+  font-size: clamp(2rem, 3.2vw, 3rem);
 }
 
 .anatomy__hint {
@@ -1419,6 +1431,10 @@ html.is-loaded .scroll-hint { transition-delay: 1.1s; }
 html:not([lang='ka']) .anatomy__done-title {
   text-transform: uppercase;
   font-weight: 600;
+}
+
+html[lang='ru'] .anatomy__done-title {
+  font-size: clamp(2rem, 3.2vw, 3rem);
 }
 
 .anatomy__done-desc {
@@ -2485,19 +2501,6 @@ html.js [data-split].is-in .split-w > span {
 
   .hero-title {
     margin: 18px 0 18px;
-    font-size: clamp(2.6rem, 11vw, 4.6rem);
-  }
-
-  html[lang='ka'] .hero-title {
-    font-size: clamp(3rem, 16.5vw, 5.4rem);
-  }
-
-  html[lang='en'] .hero-title {
-    font-size: clamp(2.8rem, 13vw, 5rem);
-  }
-
-  html[lang='ru'] .hero-title {
-    font-size: clamp(2.1rem, 9.6vw, 4rem);
   }
 
   .hero-buttons {
@@ -2520,6 +2523,7 @@ html.js [data-split].is-in .split-w > span {
   .anatomy__head {
     top: calc(var(--header-h) + 24px);
     right: var(--gutter);
+    max-width: none;
   }
 
   .anatomy__title {
@@ -2847,4 +2851,240 @@ html.js .svc[data-reveal] {
   color: var(--text);
   border-color: rgba(0, 210, 255, 0.45);
   background: rgba(0, 210, 255, 0.06);
+}
+
+/* ============================
+   Contact modal
+   Centered card on desktop, bottom sheet on phones.
+   ============================ */
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1800;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.modal[hidden] {
+  display: none;
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 5, 7, 0.6);
+  -webkit-backdrop-filter: blur(14px) saturate(120%);
+  backdrop-filter: blur(14px) saturate(120%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+
+.modal__panel {
+  position: relative;
+  width: min(480px, 100%);
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 34px;
+  border-radius: 32px;
+  background: linear-gradient(160deg, #15171c 0%, #0c0d10 70%);
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  isolation: isolate;
+  opacity: 0;
+  transform: translateY(28px) scale(0.96);
+  transition: opacity 0.35s ease, transform 0.6s var(--ease-out);
+}
+
+.modal__panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(from var(--angle), rgba(255, 255, 255, 0.06) 0deg, rgba(0, 210, 255, 0.85) 60deg, rgba(58, 123, 213, 0.5) 100deg, rgba(255, 255, 255, 0.06) 160deg, rgba(255, 255, 255, 0.06) 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: borderSpin 6s linear infinite;
+  pointer-events: none;
+}
+
+.modal.is-open .modal__backdrop {
+  opacity: 1;
+}
+
+.modal.is-open .modal__panel {
+  opacity: 1;
+  transform: none;
+}
+
+.modal__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.3s, background-color 0.3s, transform 0.4s var(--ease-out);
+}
+
+.modal__close:hover {
+  border-color: rgba(0, 210, 255, 0.5);
+  background: rgba(0, 210, 255, 0.08);
+  transform: rotate(90deg);
+}
+
+.modal__title {
+  margin-top: 18px;
+  padding-right: 40px;
+  font-size: clamp(2.4rem, 7vw, 3.4rem);
+  line-height: 0.98;
+}
+
+html[lang='ka'] .modal__title {
+  font-size: clamp(3rem, 11vw, 4.2rem);
+}
+
+.modal__desc {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.modal__phone {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 12px;
+  border-radius: 22px;
+  background: rgba(0, 210, 255, 0.07);
+  border: 1px solid rgba(0, 210, 255, 0.28);
+  transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.modal__phone:hover {
+  background: rgba(0, 210, 255, 0.12);
+  border-color: rgba(0, 210, 255, 0.55);
+  box-shadow: 0 0 40px rgba(0, 210, 255, 0.18);
+}
+
+.modal__phone-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.modal__phone-text small {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.modal__phone .contact__phone-num {
+  font-size: clamp(1.4rem, 5.6vw, 1.9rem);
+}
+
+.modal__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.modal__grid .messenger-btn {
+  justify-content: center;
+  height: 54px;
+  border-radius: 18px;
+}
+
+.modal__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.modal__address {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  transition: color 0.3s;
+}
+
+.modal__address svg {
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.modal__address:hover {
+  color: var(--text);
+}
+
+.modal__icons {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.modal__icons .icon-btn {
+  width: 44px;
+  height: 44px;
+}
+
+@media (max-width: 600px) {
+  .modal {
+    place-items: end stretch;
+    padding: 0;
+  }
+
+  .modal__panel {
+    width: 100%;
+    max-height: 92dvh;
+    padding: 28px 22px calc(24px + env(safe-area-inset-bottom, 0px));
+    border-radius: 28px 28px 0 0;
+    transform: translateY(100%);
+    transition: opacity 0.2s ease, transform 0.55s var(--ease-out);
+  }
+
+  /* Grab handle */
+  .modal__panel::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    left: 50%;
+    width: 40px;
+    height: 4px;
+    margin-left: -20px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.18);
+  }
+
+  .modal__close {
+    top: 16px;
+    right: 16px;
+  }
+
+  .modal__foot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal__icons {
+    justify-content: flex-start;
+  }
 }

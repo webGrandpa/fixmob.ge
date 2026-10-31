@@ -128,13 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeMobileNav();
+        if (e.key !== 'Escape') return;
+        if (openModal) hideModal();
+        else closeMobileNav();
     });
 
     // ================================
     // 4. Anchor links (smooth, header-aware)
     // ================================
-    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    document.querySelectorAll('a[href^="#"]:not([data-modal-open])').forEach((anchor) => {
         anchor.addEventListener('click', (e) => {
             const id = anchor.getAttribute('href');
             if (id === '#' || id.length < 2) return;
@@ -149,6 +151,72 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             // Let the menu's clip-path start closing before the page moves.
             wasOpen ? setTimeout(go, 250) : go();
+        });
+    });
+
+    // ================================
+    // 4b. Contact modal — the hero/header CTAs open it instead of scrolling
+    //     the whole page down to the contact section.
+    // ================================
+    const modals = {};
+    let openModal = null;
+    let modalTrigger = null;
+
+    function focusables(el) {
+        return [...el.querySelectorAll('a[href], button:not([disabled])')].filter((n) => n.offsetParent !== null);
+    }
+
+    function showModal(modal, trigger) {
+        if (openModal) return;
+        openModal = modal;
+        modalTrigger = trigger || document.activeElement;
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+        if (lenis) lenis.stop();
+        requestAnimationFrame(() => {
+            modal.classList.add('is-open');
+            modal.querySelector('.modal__close')?.focus({ preventScroll: true });
+        });
+    }
+
+    function hideModal() {
+        const modal = openModal;
+        if (!modal) return;
+        openModal = null;
+        modal.classList.remove('is-open');
+        document.body.style.overflow = '';
+        if (lenis) lenis.start();
+        modalTrigger?.focus({ preventScroll: true });
+        setTimeout(() => {
+            if (openModal !== modal) modal.hidden = true;
+        }, 500);
+    }
+
+    document.querySelectorAll('[data-modal-open]').forEach((trigger) => {
+        const modal = document.getElementById(trigger.dataset.modalOpen);
+        if (!modal) return;
+        modals[modal.id] = modal;
+        trigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            closeMobileNav();
+            showModal(modal, trigger);
+        });
+    });
+
+    Object.values(modals).forEach((modal) => {
+        modal.querySelectorAll('[data-modal-close]').forEach((el) => el.addEventListener('click', hideModal));
+        modal.addEventListener('keydown', (e) => {
+            if (e.key !== 'Tab') return;
+            const items = focusables(modal);
+            const first = items[0];
+            const last = items[items.length - 1];
+            if (e.shiftKey && document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
         });
     });
 
